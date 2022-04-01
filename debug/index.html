@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<style>
+			body {
+				display: flex;
+				margin: 0;
+				height: 100vh;
+				justify-content: center;
+				align-items: center;
+			}
+
+			zu-pie-chart {
+				flex: 1;
+				max-width: 50vw;
+			}
+		</style>
+	</head>
+
+	<body>
+		<zu-pie-chart>
+			<zu-pie-segment value="3" style="--color: red"></zu-pie-segment>
+			<zu-pie-segment value="4" style="--color: green"></zu-pie-segment>
+			<zu-pie-segment value="5" style="--color: blue"></zu-pie-segment>
+			<zu-pie-segment value="3" style="--color: hotpink"></zu-pie-segment>
+		</zu-pie-chart>
+	</body>
+
+	<script type="module" src="/src/pie-chart/pie-chart.ts"></script>
+</html>
