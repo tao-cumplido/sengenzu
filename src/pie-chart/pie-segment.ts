@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 interface UpdateArcParameters {
-	// readonly index: number;
+	readonly index: number;
 	readonly position: number;
 	readonly total: number;
 }
@@ -30,11 +30,18 @@ export class ZuPieSegment extends LitElement {
 
 		svg {
 			overflow: visible;
-			transform: rotate(-0.25turn);
+			transform: rotate(calc(var(--rotation, 0) - 0.25turn));
 		}
 
-		path {
+		g {
+			opacity: var(--opacity);
+			transition: var(--transition-opacity);
+		}
+
+		.slice {
 			fill: var(--color);
+			transform: rotate(var(--slice-rotation));
+			transition: var(--transition-rotation);
 		}
 
 		.stroke {
@@ -54,20 +61,34 @@ export class ZuPieSegment extends LitElement {
 	`;
 
 	@state()
-	private pathDefinition = '';
+	private startLine = '';
 
 	@state()
-	private turnFactor = 0;
+	private pathDefinition = '';
 
 	@property({ type: Number })
 	value = 0;
 
 	updateArc({ position, total }: UpdateArcParameters) {
 		const factor = this.value / total;
+		const rotation = position / total;
 		const end = calculateArcPoint(factor + ε);
 		const largeArcFlag = factor > 0.5 ? 1 : 0;
+		this.startLine = `M ${start.x} ${start.y} L 0 0`;
 		this.pathDefinition = `M ${start.x} ${start.y} A 1 1 0 ${largeArcFlag} 1 ${end.x} ${end.y} L 0 0 z`;
-		this.turnFactor = position / total;
+		this.style.setProperty('--rotation', `${rotation}turn`);
+
+		this.style.setProperty('--slice-rotation', `-${factor}turn`);
+		this.style.setProperty('--transition-rotation', 'none');
+		this.style.setProperty('--opacity', '0');
+		this.style.setProperty('--transition-opacity', 'none');
+
+		this.getBoundingClientRect();
+
+		this.style.setProperty('--slice-rotation', '0');
+		this.style.setProperty('--transition-rotation', `transform ${factor}s linear ${rotation}s`);
+		this.style.setProperty('--opacity', '1');
+		this.style.setProperty('--transition-opacity', `opacity 0s linear ${rotation}s`);
 	}
 
 	override updated(changes: Map<string, unknown>) {
@@ -81,17 +102,15 @@ export class ZuPieSegment extends LitElement {
 			<svg viewBox="-1 -1 2 2">
 				<defs>
 					<mask id="donut">
-						<circle class="stroke" cx="0" cy="0" r="1" fill="white" />
-						<circle class="donut-hole" cx="0" cy="0" fill="black" />
-					<mask>
+						<path class="stroke" d=${this.pathDefinition} fill="white" />
+						<circle class="donut-hole" fill="black" />
+					</mask>
 				</defs>
-				<path
-					class="stroke"
-					style=${styleMap({ transform: `rotate(${this.turnFactor}turn)` })}
-					mask="url(#donut)"
-					d=${this.pathDefinition}
-				/>
-				<circle class="donut-hole stroke" cx="0" cy="0" fill="none" />
+				<g mask="url(#donut)">
+					<path class="stroke slice" d=${this.pathDefinition} />
+					<path class="stroke" d=${this.startLine} />
+				</g>
+				<circle class="donut-hole stroke" fill="none" />
 			</svg>
 		`;
 	}

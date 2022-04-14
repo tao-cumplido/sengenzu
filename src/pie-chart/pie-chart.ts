@@ -19,8 +19,8 @@ export class ZuPieChart extends LitElement {
 
 		let position = 0;
 
-		for (const segment of this.segments) {
-			segment.updateArc({ total, position });
+		for (const [index, segment] of this.segments.entries()) {
+			segment.updateArc({ index, total, position });
 			position += segment.value;
 		}
 	}
