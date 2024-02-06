@@ -15,15 +15,7 @@
 		"lib": ["esnext", "dom"],
 		"sourceMap": true,
 		"importHelpers": true,
-		"experimentalDecorators": true,
-		"plugins": [
-			{
-				"name": "typescript-styled-plugin",
-				"lint": {
-					"validProperties": ["r", "vector-effect"]
-				}
-			}
-		]
+		"experimentalDecorators": true
 	},
 	"exclude": ["debug/**/*"]
 }

@@ -27,9 +27,17 @@ export class ZuPieChart extends LitElement {
 
 	constructor() {
 		super();
+
+		let updateDebounceTimeout = 0;
+
 		this.addEventListener('pie-change', (event) => {
 			event.stopPropagation();
-			this.updatePie();
+
+			if (updateDebounceTimeout) {
+				clearTimeout(updateDebounceTimeout);
+			}
+
+			updateDebounceTimeout = setTimeout(() => this.updatePie(), 100);
 		});
 	}
 

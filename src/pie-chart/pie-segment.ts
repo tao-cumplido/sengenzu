@@ -27,17 +27,25 @@ const start = calculateArcPoint(0);
 export class ZuPieSegment extends LitElement {
 	static override readonly styles = css`
 		:host {
-			grid-area: chart;
+			display: contents;
 		}
 
 		svg {
+			pointer-events: none;
+			grid-area: chart;
 			overflow: visible;
 			transform: rotate(calc(var(--rotation, 0) - 0.25turn));
 		}
 
 		g {
+			pointer-events: visiblepainted;
 			opacity: var(--opacity);
 			transition: var(--transition-opacity);
+			transform: scale(var(--scale));
+		}
+
+		g:hover {
+			transform: translate(10, 10);
 		}
 
 		.slice {
@@ -74,7 +82,7 @@ export class ZuPieSegment extends LitElement {
 	updateArc({ position, total }: UpdateArcParameters) {
 		[...(this.style as unknown as Iterable<string>)]
 			.filter((value) => value.startsWith('--mask-'))
-			.forEach((value) => this.style.setProperty(value, null));
+			.forEach((value) => this.style.removeProperty(value));
 
 		const factor = this.value / total;
 		const rotation = position / total;
@@ -163,7 +171,7 @@ export class ZuPieSegment extends LitElement {
 						<circle class="donut-hole" fill="black" />
 					</mask>
 				</defs>
-				<g mask="url(#mask)">
+				<g part="slice" mask="url(#mask)">
 					<path class="stroke slice" d=${this.slicePath} />
 					<path class="stroke" d=${this.animationStartLine} />
 				</g>
